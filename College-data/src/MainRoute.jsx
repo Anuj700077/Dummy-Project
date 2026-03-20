@@ -10,7 +10,7 @@ function MainRoute() {
     <BrowserRouter>
       <Routes>
 
-        {/* Parent Route */}
+      
         <Route path="/" element={<App />}>
           <Route path="student" element={<Student />} />
           <Route path="faculty" element={<Faculty />} />
