@@ -1,0 +1,26 @@
+body{
+    background-color: rgb(192, 224, 243);
+    motion: 0;
+    padding: 0;
+}
+
+.facultyForm{
+    border: 2px solid;
+    border-radius: 3%;
+    height: 300px;
+    width: 300px;
+    margin: auto;
+}
+.fForm{
+    padding: 40px 0;
+  margin-bottom: 15px;
+   margin-left: 10px; 
+}
+.btn button {
+    align-items: center;
+    color: white;
+    text-align: center;
+    margin-top: 40px;
+    background-color: blue;
+    margin-left: 100px;
+}

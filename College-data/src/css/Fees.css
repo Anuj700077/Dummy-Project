@@ -1,0 +1,23 @@
+body{
+    background-color: bisque;
+}
+
+.fees{
+    height: 400px;
+    width: 370px;
+    border: 2px solid black;
+    border-radius: 3%;
+    margin: auto;
+    background-color: rgb(178, 213, 240);
+}
+.feeForm{
+    padding: 40px 0;
+  margin-bottom: 15px;
+   margin-left: 15px; 
+}
+.btn1 button{
+     background-color: blue;
+     margin-top: 20px;
+     margin-left: 130px;
+     color: white;
+}

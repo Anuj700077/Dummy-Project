@@ -1,0 +1,19 @@
+.marks{
+    height: 400px;
+    width: 380px;
+    border: 2px solid black;
+    border-radius: 4%;
+    margin: auto;
+    background-color: rgb(159, 203, 250);
+}
+.mform{
+     padding: 40px 0;
+  margin-bottom: 15px;
+   margin-left: 15px; 
+}
+.btn3 button{
+     background-color: blue;
+     margin-top: 20px;
+     margin-left: 130px;
+     color: white;
+}

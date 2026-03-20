@@ -1,0 +1,14 @@
+
+.sidebar{
+  width: 220px;
+    height: 100vh;
+    background-color: #8fb6f5;
+    color: rgb(21, 4, 4);
+    padding: 20px;
+    position: fixed;
+    font-size: 30px;
+}
+.text li{
+  padding: 10px 0;
+  margin-bottom: 8px;
+}
