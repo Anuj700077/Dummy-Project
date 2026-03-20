@@ -10,6 +10,7 @@ body{
     height: 300px;
     width: 300px;
     margin: auto;
+    background-color: rgb(181, 210, 248);
 }
 .fForm{
     padding: 40px 0;

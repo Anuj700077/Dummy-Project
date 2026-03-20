@@ -1,25 +1,35 @@
 import React from "react";
 import "./App.css";
+import { Link, Outlet } from "react-router-dom";
 
 function App() {
   return (
-    <div>
+    <div style={{ display: "flex" }}>
+      
+     
       <div className="sidebar">
         <h2>Menu</h2>
-        <div className="text">
-          <ul >
-          <li>Student</li>
-          <li>Faculty</li>
-          <li>Students Mark</li>
-          <li>Student Fees</li>
+        <ul>
+          <li><Link to="/student">Student</Link></li>
+          <br />
+          <li><Link to="/faculty">Faculty</Link></li>
+          <br />
+          <li><Link to="/marks">Students Mark</Link></li>
+          <br />
+          <li><Link to="/fees">Student Fees</Link></li>
         </ul>
-        </div>
-       
       </div>
-      <h1 style={{textAlign:"center"}}>Welcome to Dashboard</h1>
+
+    
+      <div style={{ flex: 1 }}>
+        <h1 style={{ textAlign: "center" }}>Welcome to Dashboard</h1>
+
+       
+        <Outlet />
+      </div>
+
     </div>
   );
 }
-
 
 export default App;
