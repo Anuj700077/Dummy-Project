@@ -6,5 +6,8 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
-	r.POST("/students", handlers.CreateStudent)
+	r.POST("/students", handlers.CreateStudent)     //Creating a students
+	r.GET("/students", handlers.GetStudents)        //fetching students
+	r.PUT("/students/:id", handlers.UpdateStudents) //updating students by id
+	r.DELETE("/students/:id", handlers.DeleteStudent) //deleting students by id
 }
