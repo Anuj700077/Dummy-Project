@@ -37,7 +37,7 @@ const handleSubmit = async (e) => {
 
   if (editId === null) {
 
-    // CREATE
+   
     await fetch("http://localhost:8080/students", {
       method: "POST",
       headers: {
@@ -50,7 +50,7 @@ const handleSubmit = async (e) => {
 
   } else {
 
-    // UPDATE
+   
     await fetch(`http://localhost:8080/students/${editId}`, {
       method: "PUT",
       headers: {
@@ -168,7 +168,7 @@ const handleEdit = (student) => {
                  <td>
                    <button onClick={() => handleEdit(student)}
                     style={{ backgroundColor: "lightgreen" }}>Edit</button>  
-                    
+
                      <button
                       onClick={() => handleDelete(student.id)}
                        style={{ backgroundColor: "red", color: "white" }}> Delete </button>

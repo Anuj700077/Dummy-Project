@@ -12,13 +12,13 @@ import (
 func CreateStudent(c *gin.Context) {
 	var student models.Student
 
-	// Get data from frontend (JSON)
+	//here Get data from frontend (JSON)
 	if err := c.BindJSON(&student); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Insert into DB
+	// insert Insert into DB
 	_, err := database.DB.Exec(
 		"INSERT INTO students(sname, fname, address, dob) VALUES($1,$2,$3,$4)",
 		student.Sname,
@@ -62,12 +62,12 @@ func GetStudents(c *gin.Context) {
 
 func UpdateStudents(c *gin.Context) {
 
-	// get ID from URL
+	//  here get ID from URL
 	id := c.Param("id")
 
 	var student models.Student
 
-	// get updated data from frontend
+	// here we get updated data from frontend
 	if err := c.BindJSON(&student); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid input",
@@ -75,7 +75,7 @@ func UpdateStudents(c *gin.Context) {
 		return
 	}
 
-	// update query
+	
 	_, err := database.DB.Exec(
 		`UPDATE students 
 		 SET sname=$1, fname=$2, address=$3, dob=$4 
