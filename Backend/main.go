@@ -15,7 +15,8 @@ func main() {
 
 	database.ConnectDB()
 	database.CreateTable()
-
+	database.CreateFacultyTable()
+	database.CreateMarksTable()
 	routes.SetupRoutes(r)
 
 	r.Run(":8080")

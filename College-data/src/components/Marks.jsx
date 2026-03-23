@@ -9,7 +9,7 @@ function Marks(){
             <label htmlFor="text">Student Id:</label>
             <input type="text" name='sid' placeholder='Enter student id'/><br />
             <br />
-            <label htmlFor="text">Subject</label>
+            <label htmlFor="text">Subject:</label>
             <select name='subject' id="">
                 <option value="Mathematics">Mathematics</option>
                 <option value="Science">Science</option>

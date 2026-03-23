@@ -2,10 +2,8 @@ package models
 
 import "github.com/Anuj700077/Dummy-project/database"
 
-
-
 type Student struct {
-	ID      int    `json:"id"`
+	ID      int64  `json:"id"`
 	Sname   string `json:"sname"`
 	Fname   string `json:"fname"`
 	Address string `json:"address"`

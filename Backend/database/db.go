@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	_ "github.com/lib/pq"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
@@ -14,7 +14,7 @@ var DB *sql.DB
 func ConnectDB() {
 	godotenv.Load()
 
-	// here i m  Connect to default postgres DB
+	// here i m  Connecting to default postgres DB
 	defaultConn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=postgres sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -57,15 +57,14 @@ func ConnectDB() {
 	fmt.Println(" Connected to college_db")
 }
 
-
 func CreateTable() {
 	query := `
 	CREATE TABLE IF NOT EXISTS students (
 		id SERIAL PRIMARY KEY,
-		sname TEXT,
-		fname TEXT,
-		address TEXT,
-		dob DATE
+		sname TEXT NOT NULL,
+		fname TEXT NOT NULL,
+		address TEXT NOT NULL,
+		dob DATE NOT NULL
 	);
 	`
 
@@ -74,5 +73,48 @@ func CreateTable() {
 		panic(err)
 	}
 
-	fmt.Println("Table Created")
+	fmt.Println("Students Table Created")
+}
+
+//here i m creating  a table of Faculty
+
+func CreateFacultyTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS faculty (
+		id SERIAL PRIMARY KEY,
+		tname TEXT NOT NULL,
+		subject TEXT NOT NULL,
+		department TEXT NOT NULL,
+		doa DATE NOT NULL
+	);
+	`
+
+	_, err := DB.Exec(query)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Faculty Table Created")
+}
+
+func CreateMarksTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS marks (
+		id SERIAL PRIMARY KEY,
+		student_id INT NOT NULL,
+		subject TEXT NOT NULL,
+		max_marks INT NOT NULL,
+		obtained_marks INT NOT NULL,
+		percentage FLOAT,
+		grade TEXT,
+		rank INT,
+		FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+	);
+	`
+	_, err := DB.Exec(query)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Marks Table Created")
 }
