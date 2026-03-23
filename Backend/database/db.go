@@ -14,7 +14,7 @@ var DB *sql.DB
 func ConnectDB() {
 	godotenv.Load()
 
-	// Step 1: Connect to default postgres DB
+	// here i m  Connect to default postgres DB
 	defaultConn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=postgres sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -28,7 +28,7 @@ func ConnectDB() {
 		panic(err)
 	}
 
-	// Step 2: Create database if not exists
+	//here i m Creating database if not exists
 	college_db := os.Getenv("DB_NAME")
 	_, err = db.Exec("CREATE DATABASE " + college_db)
 	if err != nil {
@@ -39,7 +39,7 @@ func ConnectDB() {
 
 	db.Close()
 
-	// Step 3: Connect to your actual DB
+	//here Connect to your actual DB
 	actualConn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -54,7 +54,7 @@ func ConnectDB() {
 		panic(err)
 	}
 
-	fmt.Println("✅ Connected to college_db")
+	fmt.Println(" Connected to college_db")
 }
 
 
@@ -74,5 +74,5 @@ func CreateTable() {
 		panic(err)
 	}
 
-	fmt.Println("✅ Table Created")
+	fmt.Println("Table Created")
 }

@@ -1,10 +1,9 @@
+
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
-	database "github.com/Anuj700077/Dummy-project/database"
 	"github.com/Anuj700077/Dummy-project/models"
 	"github.com/gin-gonic/gin"
 )
@@ -12,26 +11,11 @@ import (
 func CreateStudent(c *gin.Context) {
 	var student models.Student
 
-	//here Get data from frontend (JSON)
 	if err := c.BindJSON(&student); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	// insert Insert into DB
-	_, err := database.DB.Exec(
-		"INSERT INTO students(sname, fname, address, dob) VALUES($1,$2,$3,$4)",
-		student.Sname,
-		student.Fname,
-		student.Address,
-		student.Dob,
-	)
-
-	fmt.Println("Student Name:", student.Sname)
-	fmt.Println("Father Name:", student.Fname)
-	fmt.Println("Address:", student.Address)
-	fmt.Println("DOB:", student.Dob)
-
+	err := student.Create()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert"})
 		return
@@ -40,82 +24,47 @@ func CreateStudent(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Student added successfully"})
 }
 
+
 func GetStudents(c *gin.Context) {
-	rows, err := database.DB.Query("SELECT id, sname, fname, address, dob FROM students")
+	students, err := models.GetAllStudents()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch students"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch"})
 		return
 	}
-	defer rows.Close()
-	var students []models.Student
-	for rows.Next() {
-		var student models.Student
-		err := rows.Scan(&student.ID, &student.Sname, &student.Fname, &student.Address, &student.Dob)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Students fetching error"})
-			return
-		}
-		students = append(students, student)
-	}
+
 	c.JSON(http.StatusOK, students)
 }
 
-func UpdateStudents(c *gin.Context) {
 
-	//  here get ID from URL
+func UpdateStudents(c *gin.Context) {
 	id := c.Param("id")
 
 	var student models.Student
 
-	// here we get updated data from frontend
 	if err := c.BindJSON(&student); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid input",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	
-	_, err := database.DB.Exec(
-		`UPDATE students 
-		 SET sname=$1, fname=$2, address=$3, dob=$4 
-		 WHERE id=$5`,
-		student.Sname,
-		student.Fname,
-		student.Address,
-		student.Dob,
-		id,
-	)
-
+	err := student.Update(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to update student",
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Update failed"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Student updated successfully",
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "Updated successfully"})
 }
 
-func DeleteStudent(c *gin.Context) {
 
+
+func DeleteStudent(c *gin.Context) {
 	id := c.Param("id")
 
-	_, err := database.DB.Exec(
-		"DELETE FROM students WHERE id=$1",
-		id,
-	)
-
+	err := models.DeleteStudentByID(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to delete student",
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Delete failed"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Student deleted successfully",
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "Deleted successfully"})
 }
