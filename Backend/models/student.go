@@ -1,6 +1,12 @@
 package models
 
-import "github.com/Anuj700077/Dummy-project/database"
+import (
+	
+
+	"time"
+
+	"github.com/Anuj700077/Dummy-project/database"
+)
 
 type Student struct {
 	ID      int64  `json:"id"`
@@ -34,8 +40,23 @@ func GetAllStudents() ([]Student, error) {
 
 	for rows.Next() {
 		var s Student
-		rows.Scan(&s.ID, &s.Sname, &s.Fname, &s.Address, &s.Dob)
+		var dob time.Time // temporary variable for DATE
+
+		
+		err := rows.Scan(&s.ID, &s.Sname, &s.Fname, &s.Address, &dob)
+		if err != nil {
+			return nil, err
+		}
+
+
+		s.Dob = dob.Format("2006-01-02")
+
 		students = append(students, s)
+	}
+
+
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return students, nil

@@ -6,11 +6,11 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
-	r.POST("/students", handlers.CreateStudent)     //Creating a students
-	r.GET("/students", handlers.GetStudents)        //fetching students
-	r.PUT("/students/:id", handlers.UpdateStudents) //updating students by id
+	r.POST("/students", handlers.CreateStudent)       //Creating a students
+	r.GET("/students", handlers.GetStudents)          //fetching students
+	r.PUT("/students/:id", handlers.UpdateStudents)   //updating students by id
 	r.DELETE("/students/:id", handlers.DeleteStudent) //deleting students by id
-
+	
 
 	r.POST("/faculty", handlers.CreateFaculty)
 	r.GET("/faculty", handlers.GetFaculty)
@@ -18,5 +18,9 @@ func SetupRoutes(r *gin.Engine) {
 	r.DELETE("/faculty/:id", handlers.DeleteFaculty)
 
 
+	r.POST("/marks", handlers.CreateMarks)
+	r.GET("/marks", handlers.GetMarks)
+	r.PUT("/marks", handlers.UpdateMarks)
+	r.DELETE("/marks/:id", handlers.DeleteMarks) 
 
 }

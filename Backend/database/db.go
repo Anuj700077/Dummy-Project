@@ -101,16 +101,21 @@ func CreateMarksTable() {
 	query := `
 	CREATE TABLE IF NOT EXISTS marks (
 		id SERIAL PRIMARY KEY,
-		student_id INT NOT NULL,
-		subject TEXT NOT NULL,
-		max_marks INT NOT NULL,
-		obtained_marks INT NOT NULL,
-		percentage FLOAT,
-		grade TEXT,
-		rank INT,
+		student_id INT UNIQUE NOT NULL,
+
+		math INT DEFAULT 0,
+		science INT DEFAULT 0,
+		hindi INT DEFAULT 0,
+		english INT DEFAULT 0,
+		computer INT DEFAULT 0,
+
+		total INT DEFAULT 0,
+		percentage FLOAT DEFAULT 0,
+
 		FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 	);
 	`
+
 	_, err := DB.Exec(query)
 	if err != nil {
 		panic(err)

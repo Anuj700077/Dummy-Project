@@ -1,6 +1,10 @@
 package models
 
-import "github.com/Anuj700077/Dummy-project/database"
+import (
+	"time"
+
+	"github.com/Anuj700077/Dummy-project/database"
+)
 
 type Faculty struct {
 	ID         int64  `json:"id"`
@@ -30,10 +34,17 @@ func GetAllFaculty() ([]Faculty, error) {
 
 	for rows.Next() {
 		var f Faculty
-		err := rows.Scan(&f.ID, &f.Tname, &f.Subject, &f.Department, &f.DOA)
+		var doa time.Time 
+
+		
+		err := rows.Scan(&f.ID, &f.Tname, &f.Subject, &f.Department, &doa)
 		if err != nil {
 			return nil, err
 		}
+
+		
+		f.DOA = doa.Format("2006-01-02")
+
 		faculty = append(faculty, f)
 	}
 
@@ -43,6 +54,7 @@ func GetAllFaculty() ([]Faculty, error) {
 
 	return faculty, nil
 }
+
 
 func (f *Faculty) UpdateFaculty(id int64) error {
 	_, err := database.DB.Exec(

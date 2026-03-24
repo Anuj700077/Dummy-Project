@@ -3,7 +3,7 @@ import '../css/Faculty.css'
 
 function Faculty() {
 
-// 🔹 Form State
+
 const [formData, setFormData] = useState({
 tname: '',
 subject: '',
