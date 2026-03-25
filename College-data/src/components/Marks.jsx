@@ -13,14 +13,14 @@ function Marks() {
   });
 
   const [students, setStudents] = useState([]);
-  const [isEdit, setIsEdit] = useState(false); // ✅ edit mode
+  const [isEdit, setIsEdit] = useState(false); 
 
-  // Handle input
+  
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ SUBMIT / UPDATE
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -68,7 +68,7 @@ function Marks() {
         computer: ""
       });
 
-      setIsEdit(false); // reset edit mode
+      setIsEdit(false); 
 
     } catch (err) {
       console.error(err);
@@ -76,7 +76,7 @@ function Marks() {
     }
   };
 
-  // ✅ FETCH
+ 
   const fetchStudents = async () => {
     try {
       const res = await fetch("http://localhost:8080/marks");
@@ -91,7 +91,7 @@ function Marks() {
     fetchStudents();
   }, []);
 
-  // ✅ EDIT FUNCTION
+ 
   const handleEdit = (student) => {
     setFormData({
       sid: student.sid,
@@ -105,7 +105,7 @@ function Marks() {
     setIsEdit(true);
   };
 
-  // ✅ DELETE FUNCTION
+ 
   const handleDelete = async (sid) => {
 
     if (!window.confirm("Are you sure to delete?")) return;
@@ -135,7 +135,7 @@ function Marks() {
     <>
       <h1 style={{ textAlign: "center" }}>Students Marks</h1>
 
-      {/* FORM */}
+     
       <div className="marks">
         <form className="mform" onSubmit={handleSubmit}>
 
@@ -172,7 +172,7 @@ function Marks() {
         </form>
       </div>
 
-      {/* TABLE */}
+      
       <h2 style={{ textAlign: "center" }}>Marks List</h2>
 
       <div className="marksEntry">

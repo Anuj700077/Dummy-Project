@@ -18,7 +18,7 @@ func CreateMarks(c *gin.Context) {
 
 	err := m.CreateMark()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Colud not save marks"})
 		return
 	}
 
@@ -35,8 +35,6 @@ func GetMarks(c *gin.Context) {
 
 	c.JSON(http.StatusOK, marks)
 }
-
-
 
 func UpdateMarks(c *gin.Context) {
 	var m models.Marks
@@ -60,9 +58,6 @@ func UpdateMarks(c *gin.Context) {
 		"message": "marks updated successfully",
 	})
 }
-
-
-
 
 func DeleteMarks(c *gin.Context) {
 
@@ -88,4 +83,3 @@ func DeleteMarks(c *gin.Context) {
 		"message": "marks deleted successfully",
 	})
 }
-

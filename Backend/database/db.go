@@ -123,3 +123,26 @@ func CreateMarksTable() {
 
 	fmt.Println("Marks Table Created")
 }
+
+func CreateFeeTable() {
+	query := `
+	CREATE TABLE IF NOT EXISTS fees (
+		id SERIAL PRIMARY KEY,
+		student_id INT NOT NULL,
+		feemonth DATE NOT NULL,
+		amtpaid INT NOT NULL,
+		amtdue INT NOT NULL,
+		receivedate DATE NOT NULL,
+
+		FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+	);
+	`
+
+	_, err := DB.Exec(query)
+	if err != nil {
+		fmt.Println(" Could not create Fees table:", err)
+		return
+	}
+
+	fmt.Println("Fees table created successfully")
+}

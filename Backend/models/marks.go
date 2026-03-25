@@ -50,20 +50,10 @@ func (m *Marks) CreateMark() error {
 func GetAllMarks() ([]Marks, error) {
 
 	query := `
-SELECT 
-	m.id,
-	m.student_id,
-	s.sname,  
-	m.math,
-	m.science,
-	m.hindi,
-	m.english,
-	m.computer,
-	m.total,
-	m.percentage
-FROM marks m
-INNER JOIN students s ON m.student_id = s.id
-ORDER BY m.id;
+     SELECT m.id, m.student_id, s.sname, m.math, m.science, m.hindi, m.english, m.computer, m.total, m.percentage
+     FROM marks m
+     INNER JOIN students s ON m.student_id = s.id
+    ORDER BY m.id;
 `
 
 	rows, err := database.DB.Query(query)
@@ -77,30 +67,22 @@ ORDER BY m.id;
 
 	for rows.Next() {
 		var m Marks
-
 		err := rows.Scan(
 			&m.ID, &m.Sid, &m.Sname, &m.Math, &m.Science, &m.Hindi, &m.English, &m.Computer, &m.Total, &m.Percentage,
 		)
-
 		if err != nil {
 			fmt.Println("Scan Error:", err)
 			return nil, errors.New("error reading data")
 		}
-
 		marksList = append(marksList, m)
-	}
-
-	// check iteration error
+	}	
 	if err = rows.Err(); err != nil {
 		fmt.Println("Rows Error:", err)
 		return nil, errors.New("error processing data")
-	}
-
-	// optional: no data case
+	}	
 	if len(marksList) == 0 {
 		return nil, errors.New("no marks found")
 	}
-
 	return marksList, nil
 }
 
@@ -109,8 +91,6 @@ func (m *Marks) UpdateMark() error {
 	if m.Sid == 0 {
 		return errors.New("student id required")
 	}
-
-	// recalculate
 	m.Total = m.Math + m.Science + m.Hindi + m.English + m.Computer
 	m.Percentage = float64(m.Total) / 5
 
@@ -126,7 +106,6 @@ func (m *Marks) UpdateMark() error {
 		WHERE student_id=$8`,
 		m.Math, m.Science, m.Hindi, m.English, m.Computer, m.Total, m.Percentage, m.Sid,
 	)
-
 	if err != nil {
 		return errors.New("data not updated")
 	}
@@ -135,9 +114,10 @@ func (m *Marks) UpdateMark() error {
 	if rowsAffected == 0 {
 		return errors.New("no record found to update")
 	}
-
 	return nil
 }
+
+
 
 func DeleteMark(sid int64) error {
 
@@ -149,11 +129,9 @@ func DeleteMark(sid int64) error {
 	if err != nil {
 		return errors.New("data not deleted")
 	}
-
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		return errors.New("no record found to delete")
 	}
-
 	return nil
 }
