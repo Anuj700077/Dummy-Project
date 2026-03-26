@@ -11,10 +11,11 @@ import (
 
 var DB *sql.DB
 
+// ✅ CONNECT DATABASE
 func ConnectDB() {
 	godotenv.Load()
 
-	// here i m  Connecting to default postgres DB
+	// Connect to default postgres DB
 	defaultConn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=postgres sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -28,25 +29,26 @@ func ConnectDB() {
 		panic(err)
 	}
 
-	//here i m Creating database if not exists
-	college_db := os.Getenv("DB_NAME")
-	_, err = db.Exec("CREATE DATABASE " + college_db)
+	// Create database if not exists
+	collegeDB := os.Getenv("DB_NAME")
+
+	_, err = db.Exec("CREATE DATABASE " + collegeDB)
 	if err != nil {
-		fmt.Println(" Database may already exist")
+		fmt.Println("Database already exists or no permission")
 	} else {
 		fmt.Println("✅ Database created")
 	}
 
 	db.Close()
 
-	//here Connect to your actual DB
+	// Connect to actual DB
 	actualConn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
-		college_db,
+		collegeDB,
 	)
 
 	DB, err = sql.Open("postgres", actualConn)
@@ -54,9 +56,20 @@ func ConnectDB() {
 		panic(err)
 	}
 
-	fmt.Println(" Connected to college_db")
+	// ✅ Check connection
+	err = DB.Ping()
+	if err != nil {
+		panic("❌ DB not reachable")
+	}
+
+	fmt.Println("✅ Connected to college_db")
 }
 
+//
+// ================= TABLES =================
+//
+
+// ✅ STUDENTS TABLE
 func CreateTable() {
 	query := `
 	CREATE TABLE IF NOT EXISTS students (
@@ -73,11 +86,10 @@ func CreateTable() {
 		panic(err)
 	}
 
-	fmt.Println("Students Table Created")
+	fmt.Println("✅ Students Table Created")
 }
 
-//here i m creating  a table of Faculty
-
+// ✅ FACULTY TABLE
 func CreateFacultyTable() {
 	query := `
 	CREATE TABLE IF NOT EXISTS faculty (
@@ -94,9 +106,10 @@ func CreateFacultyTable() {
 		panic(err)
 	}
 
-	fmt.Println("Faculty Table Created")
+	fmt.Println("✅ Faculty Table Created")
 }
 
+// ✅ MARKS TABLE
 func CreateMarksTable() {
 	query := `
 	CREATE TABLE IF NOT EXISTS marks (
@@ -121,9 +134,10 @@ func CreateMarksTable() {
 		panic(err)
 	}
 
-	fmt.Println("Marks Table Created")
+	fmt.Println("✅ Marks Table Created")
 }
 
+// ✅ FEES TABLE (FULLY FIXED)
 func CreateFeeTable() {
 	query := `
 	CREATE TABLE IF NOT EXISTS fees (
@@ -134,15 +148,20 @@ func CreateFeeTable() {
 		amtdue INT NOT NULL,
 		receivedate DATE NOT NULL,
 
+		
+		UNIQUE(student_id, feemonth),
+
 		FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 	);
+
+	CREATE INDEX IF NOT EXISTS idx_fees_student_id ON fees(student_id);
 	`
 
 	_, err := DB.Exec(query)
 	if err != nil {
-		fmt.Println(" Could not create Fees table:", err)
+		fmt.Println("❌ Could not create Fees table:", err)
 		return
 	}
 
-	fmt.Println("Fees table created successfully")
+	fmt.Println("✅ Fees table created successfully")
 }

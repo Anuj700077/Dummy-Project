@@ -11,13 +11,14 @@ function Fees() {
     });
 
     const [history, setHistory] = useState([]);
+    const [isHistoryView, setIsHistoryView] = useState(false);
 
-  
     useEffect(() => {
-        fetchAllFees();
+        fetchFees();
     }, []);
 
-    const fetchAllFees = async () => {
+   
+    const fetchFees = async () => {
         try {
             const res = await fetch("http://localhost:8080/fees");
             const data = await res.json();
@@ -25,14 +26,39 @@ function Fees() {
             if (Array.isArray(data)) {
                 setHistory(data);
             } else {
+                console.error("Invalid response:", data);
                 setHistory([]);
             }
 
-        } catch {
+            setIsHistoryView(false);
+
+        } catch (err) {
+            console.error(err);
             alert("Failed to fetch data");
         }
     };
 
+    
+    const fetchStudentHistory = async (sid) => {
+        try {
+            const res = await fetch(`http://localhost:8080/fees/student/${sid}`);
+            const data = await res.json();
+
+            if (Array.isArray(data)) {
+                setHistory(data);
+                setIsHistoryView(true);
+            } else {
+                console.error("Invalid history response:", data);
+                alert("No history found");
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("Failed to fetch student history");
+        }
+    };
+
+  
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -40,6 +66,7 @@ function Fees() {
         });
     };
 
+   
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -61,7 +88,7 @@ function Fees() {
             alert(data.message);
 
             if (res.ok) {
-                fetchAllFees(); 
+                fetchFees();
                 setFormData({
                     sid: "",
                     feemonth: "",
@@ -70,9 +97,25 @@ function Fees() {
                 });
             }
 
-        } catch {
-            alert(" Error submitting fee");
+        } catch (err) {
+            console.error(err);
+            alert("Error submitting fee");
         }
+    };
+
+   
+    const formatMonth = (date) => {
+        if (!date) return "N/A";
+        const d = new Date(date);
+        return isNaN(d) ? "N/A" :
+            `${d.toLocaleString("en-US", { month: "long" })} - ${d.getFullYear()}`;
+    };
+
+    const formatDate = (date) => {
+        if (!date) return "N/A";
+        const d = new Date(date);
+        return isNaN(d) ? "N/A" :
+            d.toLocaleDateString("en-GB").split("/").join("-");
     };
 
     return (
@@ -81,7 +124,6 @@ function Fees() {
 
             <div className='fees'>
                 <form className='feeForm' onSubmit={handleSubmit}>
-
                     <label>Student Id:</label>
                     <input type="number" name="sid" value={formData.sid} onChange={handleChange} /><br /><br />
 
@@ -94,43 +136,61 @@ function Fees() {
                     <label>Received Date:</label>
                     <input type="date" name="receivedate" value={formData.receivedate} onChange={handleChange} /><br /><br />
 
-                    <button style={{marginLeft:"130px", marginTop:"40px"}} type="submit">Submit</button>
+                    <button type="submit">Submit</button>
                 </form>
             </div>
 
-            <h2 style={{ textAlign: "center" }}>All Students Fees</h2>
+           
+            {isHistoryView && (
+                <div style={{ textAlign: "center", marginTop: "20px" }}>
+                    <button onClick={fetchFees}>⬅ Back</button>
+                </div>
+            )}
+
+            <h2 style={{ textAlign: "center" }}>
+                {isHistoryView ? "Student Fee History" : "Students Fees"}
+            </h2>
 
             {history.length > 0 ? (
                 <table border="1" style={{ margin: "auto" }} cellPadding='10'>
-    <thead>
-        <tr>
-            <th>Student ID</th>
-            <th>Student Name</th>
-            <th>Father Name</th>
-            <th>Month</th>
-            <th>Paid</th>
-            <th>Due</th>
-            <th>Received Date</th>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Father</th>
+                            <th>Month</th>
+                            <th>Paid</th>
+                            <th>Due</th>
+                            <th>Date</th>
+                            {!isHistoryView && <th>Action</th>}
+                        </tr>
+                    </thead>
 
-        </tr>
-    </thead>
-    <tbody>
-        {history.map((f, index) => (
-            <tr key={index}>
-                <td>{f.sid}</td>
-                <td>{f.sname}</td>   
-                <td>{f.fname}</td>   
-                <td>{f.feemonth ? `${new Date(f.feemonth).toLocaleString
-                ("en-US", { month: "long" })} - ${new Date(f.feemonth).getFullYear()}`: ""}</td>
-                <td>{f.amtpaid}</td>
-                <td>{f.amtdue}</td>
-                <td> {f.receivedate ? new Date(f.receivedate).toLocaleDateString
-                ("en-GB").split("/").join("-") : ""}</td>
-            </tr>
-        ))}
-    </tbody>
-</table>
+                    <tbody>
+                        {history.map((f, index) => (
+                            <tr key={index}>
+                                <td>{f.sid}</td>
+                                <td>{f.sname}</td>
+                                <td>{f.fname}</td>
 
+                                <td>{formatMonth(f.feemonth)}</td>
+
+                                <td>{f.amtpaid}</td>
+                                <td>{f.amtdue}</td>
+
+                                <td>{formatDate(f.receivedate)}</td>
+
+                                {!isHistoryView && (
+                                    <td>
+                                        <button onClick={() => fetchStudentHistory(f.sid)}>
+                                            View History
+                                        </button>
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             ) : (
                 <p style={{ textAlign: "center" }}>No data available</p>
             )}

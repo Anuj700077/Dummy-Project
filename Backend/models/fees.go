@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -18,9 +19,11 @@ type Fees struct {
 	ReceiveDate string `json:"receivedate"`
 }
 
-const MonthlyFee = 5000
+const MonthlyFee int64 = 5000
+
 
 func CreateFee(f Fees) error {
+
 
 	var exists int
 	err := database.DB.QueryRow(
@@ -34,34 +37,74 @@ func CreateFee(f Fees) error {
 		return errors.New("student not found")
 	}
 
-	// check previous due
+	
 	var lastDue int64
-	err = database.DB.QueryRow(`
-		SELECT amtdue FROM fees 
-		WHERE student_id=$1 
-		ORDER BY feemonth DESC 
-		LIMIT 1
-	`, f.Sid).Scan(&lastDue)
+	var lastMonth string
 
-	if err != nil && err.Error() != "sql: no rows in result set" {
-		return errors.New("error checking previous dues")
+	err = database.DB.QueryRow(`
+		SELECT feemonth, amtdue FROM fees 
+		WHERE student_id=$1 
+		ORDER BY id DESC 
+		LIMIT 1
+	`, f.Sid).Scan(&lastMonth, &lastDue)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			lastDue = 0
+			lastMonth = ""
+		} else {
+			return errors.New("error fetching last record")
+		}
 	}
+
+	
+	if lastMonth == f.FeeMonth {
+
+		totalFee := lastDue
+		calculatedDue := totalFee - f.Amtpaid
+
+		if calculatedDue < 0 {
+			calculatedDue = 0
+		}
+
+		_, err = database.DB.Exec(`
+			UPDATE fees 
+			SET amtpaid = amtpaid + $1,
+			    amtdue = $2,
+			    receivedate = $3
+			WHERE student_id=$4 AND feemonth=$5
+		`,
+			f.Amtpaid,
+			calculatedDue,
+			f.ReceiveDate,
+			f.Sid,
+			f.FeeMonth,
+		)
+
+		if err != nil {
+			return errors.New("failed to update fee")
+		}
+
+		return nil
+	}
+
 
 	if lastDue > 0 {
-		return fmt.Errorf("previous due pending: %d", lastDue)
+		return fmt.Errorf(" clear previous due first: %d", lastDue)
 	}
 
-	calculatedDue := MonthlyFee - f.Amtpaid
+
+	totalFee := MonthlyFee               
+	calculatedDue := totalFee - f.Amtpaid 
+
 	if calculatedDue < 0 {
 		calculatedDue = 0
 	}
 
-	query := `
-	INSERT INTO fees (student_id, feemonth, amtpaid, amtdue, receivedate)
-	VALUES ($1, $2, $3, $4, $5)
-	`
-	_, err = database.DB.Exec(
-		query,
+	_, err = database.DB.Exec(`
+		INSERT INTO fees (student_id, feemonth, amtpaid, amtdue, receivedate)
+		VALUES ($1, $2, $3, $4, $5)
+	`,
 		f.Sid,
 		f.FeeMonth,
 		f.Amtpaid,
@@ -70,14 +113,52 @@ func CreateFee(f Fees) error {
 	)
 
 	if err != nil {
-		fmt.Println("DB ERROR:", err)
 		return errors.New("fees not inserted")
 	}
 
 	return nil
 }
 
-func GetAllFees() ([]Fees, error) {
+func GetLatestFees() ([]Fees, error) {
+
+	rows, err := database.DB.Query(`
+		SELECT DISTINCT ON (f.student_id)
+			f.id,
+			f.student_id,
+			s.sname,
+			s.fname,
+			f.feemonth,
+			f.amtpaid,
+			f.amtdue,
+			f.receivedate
+		FROM fees f
+		JOIN students s ON s.id = f.student_id
+		ORDER BY f.student_id, f.id DESC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var fees []Fees
+
+	for rows.Next() {
+		var f Fees
+		err := rows.Scan(
+			&f.ID, &f.Sid, &f.Sname, &f.Fname,
+			&f.FeeMonth, &f.Amtpaid, &f.Amtdue, &f.ReceiveDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		fees = append(fees, f)
+	}
+
+	return fees, nil
+}
+
+
+func GetFeesByStudentID(sid int64) ([]Fees, error) {
 
 	rows, err := database.DB.Query(`
 		SELECT 
@@ -91,8 +172,9 @@ func GetAllFees() ([]Fees, error) {
 			f.receivedate
 		FROM fees f
 		JOIN students s ON s.id = f.student_id
-		ORDER BY f.feemonth DESC
-	`)
+		WHERE f.student_id = $1
+		ORDER BY f.id DESC
+	`, sid)
 
 	if err != nil {
 		return nil, err
@@ -104,7 +186,8 @@ func GetAllFees() ([]Fees, error) {
 	for rows.Next() {
 		var f Fees
 		err := rows.Scan(
-			&f.ID, &f.Sid, &f.Sname, &f.Fname, &f.FeeMonth, &f.Amtpaid, &f.Amtdue, &f.ReceiveDate,
+			&f.ID, &f.Sid, &f.Sname, &f.Fname,
+			&f.FeeMonth, &f.Amtpaid, &f.Amtdue, &f.ReceiveDate,
 		)
 		if err != nil {
 			return nil, err
@@ -113,8 +196,4 @@ func GetAllFees() ([]Fees, error) {
 	}
 
 	return fees, nil
-}
-
-func UpdateFess(){
-	
 }
