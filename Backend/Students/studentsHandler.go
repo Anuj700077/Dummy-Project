@@ -1,20 +1,20 @@
 
-package handlers
+package students
 
 import (
 	"net/http"
 
-	"github.com/Anuj700077/Dummy-project/models"
 	"github.com/gin-gonic/gin"
 )
 
 func CreateStudent(c *gin.Context) {
-	var student models.Student
+	var student Student
 
 	if err := c.BindJSON(&student); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	err := student.Create()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert"})
@@ -24,9 +24,8 @@ func CreateStudent(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Student added successfully"})
 }
 
-
 func GetStudents(c *gin.Context) {
-	students, err := models.GetAllStudents()
+	students, err := GetAllStudents()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch"})
 		return
@@ -35,11 +34,10 @@ func GetStudents(c *gin.Context) {
 	c.JSON(http.StatusOK, students)
 }
 
-
 func UpdateStudents(c *gin.Context) {
 	id := c.Param("id")
 
-	var student models.Student
+	var student Student
 
 	if err := c.BindJSON(&student); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
@@ -55,12 +53,10 @@ func UpdateStudents(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Updated successfully"})
 }
 
-
-
 func DeleteStudent(c *gin.Context) {
 	id := c.Param("id")
 
-	err := models.DeleteStudentByID(id)
+	err := DeleteStudentByID(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Delete failed"})
 		return

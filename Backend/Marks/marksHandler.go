@@ -1,15 +1,15 @@
-package handlers
+package marks
 
 import (
 	"net/http"
 	"strconv"
 
-	"github.com/Anuj700077/Dummy-project/models"
 	"github.com/gin-gonic/gin"
 )
 
+// CREATE
 func CreateMarks(c *gin.Context) {
-	var m models.Marks
+	var m Marks
 
 	if err := c.BindJSON(&m); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
@@ -18,68 +18,59 @@ func CreateMarks(c *gin.Context) {
 
 	err := m.CreateMark()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Colud not save marks"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not save marks"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Marks saved successfully"})
 }
 
+// GET ALL
 func GetMarks(c *gin.Context) {
 
-	marks, err := models.GetAllMarks()
+	marksList, err := GetAllMarks()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch marks"})
 		return
 	}
 
-	c.JSON(http.StatusOK, marks)
+	c.JSON(http.StatusOK, marksList)
 }
 
+// UPDATE
 func UpdateMarks(c *gin.Context) {
-	var m models.Marks
+	var m Marks
 
 	if err := c.BindJSON(&m); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid input",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
 
 	err := m.UpdateMark()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "marks updated successfully",
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "marks updated successfully"})
 }
 
-func DeleteMarks(c *gin.Context) {
+// DELETE
+func DeleteMarksHandler(c *gin.Context) {
 
 	idParam := c.Param("id")
 
 	sid, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid id",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
 
-	err = models.DeleteMark(sid)
+	err = DeleteMark(sid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "marks deleted successfully",
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "marks deleted successfully"})
 }

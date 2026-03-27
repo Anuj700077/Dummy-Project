@@ -1,35 +1,35 @@
-package handlers
+package fees
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 
-	"github.com/Anuj700077/Dummy-project/models"
 	"github.com/gin-gonic/gin"
 )
 
-
+// CREATE
 func CreateFees(c *gin.Context) {
 
-	var fee models.Fees
+	var fee Fees
 
 	if err := c.ShouldBindJSON(&fee); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid input"})
 		return
 	}
 
-	err := models.CreateFee(fee)
+	err := CreateFee(fee)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "✅ fee added successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "fee added successfully"})
 }
 
-func GetLatestFees(c *gin.Context) {
+// GET LATEST
+func GetLatestFeesHandler(c *gin.Context) {
 
-	fees, err := models.GetLatestFees()
+	feesList, err := GetLatestFees()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "could not fetch latest fees",
@@ -37,18 +37,21 @@ func GetLatestFees(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, fees)
+	c.JSON(http.StatusOK, feesList)
 }
 
-
+// GET BY STUDENT
 func GetFeesByStudent(c *gin.Context) {
 
-	sid := c.Param("sid")
+	sidParam := c.Param("sid")
 
-	var studentID int64
-	fmt.Sscan(sid, &studentID)
+	sid, err := strconv.ParseInt(sidParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid student id"})
+		return
+	}
 
-	fees, err := models.GetFeesByStudentID(studentID)
+	feesList, err := GetFeesByStudentID(sid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "could not fetch student history",
@@ -56,5 +59,5 @@ func GetFeesByStudent(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, fees)
+	c.JSON(http.StatusOK, feesList)
 }

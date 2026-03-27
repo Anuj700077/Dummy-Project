@@ -1,8 +1,6 @@
-package models
+package students
 
 import (
-	
-
 	"time"
 
 	"github.com/Anuj700077/Dummy-project/database"
@@ -16,7 +14,7 @@ type Student struct {
 	Dob     string `json:"dob"`
 }
 
-// Here Create Student
+// CREATE
 func (s *Student) Create() error {
 	_, err := database.DB.Exec(
 		"INSERT INTO students(sname, fname, address, dob) VALUES($1,$2,$3,$4)",
@@ -28,7 +26,7 @@ func (s *Student) Create() error {
 	return err
 }
 
-// Here fetch  All Students
+// GET ALL
 func GetAllStudents() ([]Student, error) {
 	rows, err := database.DB.Query("SELECT id, sname, fname, address, dob FROM students")
 	if err != nil {
@@ -40,29 +38,21 @@ func GetAllStudents() ([]Student, error) {
 
 	for rows.Next() {
 		var s Student
-		var dob time.Time // temporary variable for DATE
+		var dob time.Time
 
-		
 		err := rows.Scan(&s.ID, &s.Sname, &s.Fname, &s.Address, &dob)
 		if err != nil {
 			return nil, err
 		}
 
-
 		s.Dob = dob.Format("2006-01-02")
-
 		students = append(students, s)
-	}
-
-
-	if err = rows.Err(); err != nil {
-		return nil, err
 	}
 
 	return students, nil
 }
 
-// Here update Student
+// UPDATE
 func (s *Student) Update(id string) error {
 	_, err := database.DB.Exec(
 		`UPDATE students SET sname=$1, fname=$2, address=$3, dob=$4 WHERE id=$5`,
@@ -71,7 +61,7 @@ func (s *Student) Update(id string) error {
 	return err
 }
 
-// here Delete Student
+// DELETE
 func DeleteStudentByID(id string) error {
 	_, err := database.DB.Exec("DELETE FROM students WHERE id=$1", id)
 	return err

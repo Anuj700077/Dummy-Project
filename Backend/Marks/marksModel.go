@@ -1,4 +1,4 @@
-package models
+package marks
 
 import (
 	"errors"
@@ -20,6 +20,7 @@ type Marks struct {
 	Percentage float64 `json:"percentage"`
 }
 
+// CREATE OR UPSERT
 func (m *Marks) CreateMark() error {
 
 	if m.Sid == 0 {
@@ -27,7 +28,6 @@ func (m *Marks) CreateMark() error {
 	}
 
 	m.Total = m.Math + m.Science + m.Hindi + m.English + m.Computer
-
 	m.Percentage = float64(m.Total) / 5
 
 	_, err := database.DB.Exec(
@@ -35,26 +35,28 @@ func (m *Marks) CreateMark() error {
 		(student_id, math, science, hindi, english, computer, total, percentage) 
 		VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
 		ON CONFLICT (student_id) 
-		DO UPDATE SET math=$2, science=$3, hindi=$4, english=$5, computer=$6, total=$7, percentage=$8`,
+		DO UPDATE SET 
+			math=$2, science=$3, hindi=$4, english=$5, computer=$6, total=$7, percentage=$8`,
 		m.Sid, m.Math, m.Science, m.Hindi, m.English, m.Computer, m.Total, m.Percentage,
 	)
 
 	if err != nil {
-		fmt.Println("DB Insert Error:", err) // for server logs
+		fmt.Println("DB Insert Error:", err)
 		return errors.New("data not inserted")
 	}
 
 	return nil
 }
 
+// GET ALL
 func GetAllMarks() ([]Marks, error) {
 
 	query := `
-     SELECT m.id, m.student_id, s.sname, m.math, m.science, m.hindi, m.english, m.computer, m.total, m.percentage
-     FROM marks m
-     INNER JOIN students s ON m.student_id = s.id
-    ORDER BY m.id;
-`
+	SELECT m.id, m.student_id, s.sname, m.math, m.science, m.hindi, m.english, m.computer, m.total, m.percentage
+	FROM marks m
+	INNER JOIN students s ON m.student_id = s.id
+	ORDER BY m.id;
+	`
 
 	rows, err := database.DB.Query(query)
 	if err != nil {
@@ -75,22 +77,22 @@ func GetAllMarks() ([]Marks, error) {
 			return nil, errors.New("error reading data")
 		}
 		marksList = append(marksList, m)
-	}	
-	if err = rows.Err(); err != nil {
-		fmt.Println("Rows Error:", err)
-		return nil, errors.New("error processing data")
-	}	
-	if len(marksList) == 0 {
-		return nil, errors.New("no marks found")
 	}
+
+	if err = rows.Err(); err != nil {
+		return nil, errors.New("error processing data")
+	}
+
 	return marksList, nil
 }
 
+// UPDATE
 func (m *Marks) UpdateMark() error {
 
 	if m.Sid == 0 {
 		return errors.New("student id required")
 	}
+
 	m.Total = m.Math + m.Science + m.Hindi + m.English + m.Computer
 	m.Percentage = float64(m.Total) / 5
 
@@ -114,11 +116,11 @@ func (m *Marks) UpdateMark() error {
 	if rowsAffected == 0 {
 		return errors.New("no record found to update")
 	}
+
 	return nil
 }
 
-
-
+// DELETE
 func DeleteMark(sid int64) error {
 
 	result, err := database.DB.Exec(
@@ -129,9 +131,11 @@ func DeleteMark(sid int64) error {
 	if err != nil {
 		return errors.New("data not deleted")
 	}
+
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		return errors.New("no record found to delete")
 	}
+
 	return nil
 }

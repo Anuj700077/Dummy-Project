@@ -10,15 +10,19 @@ import (
 func main() {
 	r := gin.Default()
 
-	// Allow React to call backend
+	// CORS
 	r.Use(cors.Default())
 
+	// DB setup
 	database.ConnectDB()
 	database.CreateTable()
 	database.CreateFacultyTable()
 	database.CreateMarksTable()
 	database.CreateFeeTable()
+
+	// Routes
 	routes.SetupRoutes(r)
 
+	// Run server
 	r.Run(":8080")
 }

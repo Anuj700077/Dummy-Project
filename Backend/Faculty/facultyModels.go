@@ -1,4 +1,4 @@
-package models
+package faculty
 
 import (
 	"time"
@@ -14,15 +14,16 @@ type Faculty struct {
 	DOA        string `json:"doa"`
 }
 
+// CREATE
 func (f *Faculty) CreateFaculty() error {
 	_, err := database.DB.Exec(
 		"INSERT INTO faculty (tname, subject, department, doa) VALUES($1, $2, $3, $4)",
 		f.Tname, f.Subject, f.Department, f.DOA,
 	)
 	return err
-
 }
 
+// GET ALL
 func GetAllFaculty() ([]Faculty, error) {
 	rows, err := database.DB.Query("SELECT id, tname, subject, department, doa FROM faculty")
 	if err != nil {
@@ -30,32 +31,25 @@ func GetAllFaculty() ([]Faculty, error) {
 	}
 	defer rows.Close()
 
-	var faculty []Faculty
+	var facultyList []Faculty
 
 	for rows.Next() {
 		var f Faculty
-		var doa time.Time 
+		var doa time.Time
 
-		
 		err := rows.Scan(&f.ID, &f.Tname, &f.Subject, &f.Department, &doa)
 		if err != nil {
 			return nil, err
 		}
 
-		
 		f.DOA = doa.Format("2006-01-02")
-
-		faculty = append(faculty, f)
+		facultyList = append(facultyList, f)
 	}
 
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return faculty, nil
+	return facultyList, nil
 }
 
-
+// UPDATE
 func (f *Faculty) UpdateFaculty(id int64) error {
 	_, err := database.DB.Exec(
 		"UPDATE faculty SET tname=$1, subject=$2, department=$3, doa=$4 WHERE id=$5",
@@ -64,8 +58,8 @@ func (f *Faculty) UpdateFaculty(id int64) error {
 	return err
 }
 
+// DELETE
 func DeleteFaculty(id int64) error {
 	_, err := database.DB.Exec("DELETE FROM faculty WHERE id=$1", id)
 	return err
 }
-

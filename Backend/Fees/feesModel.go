@@ -1,4 +1,4 @@
-package models
+package fees
 
 import (
 	"database/sql"
@@ -21,10 +21,10 @@ type Fees struct {
 
 const MonthlyFee int64 = 5000
 
-
+// CREATE / UPDATE LOGIC
 func CreateFee(f Fees) error {
 
-
+	// ✅ check student exists
 	var exists int
 	err := database.DB.QueryRow(
 		"SELECT COUNT(*) FROM students WHERE id=$1", f.Sid,
@@ -37,7 +37,7 @@ func CreateFee(f Fees) error {
 		return errors.New("student not found")
 	}
 
-	
+	// ✅ get last record
 	var lastDue int64
 	var lastMonth string
 
@@ -57,11 +57,10 @@ func CreateFee(f Fees) error {
 		}
 	}
 
-	
+	// ✅ SAME MONTH UPDATE
 	if lastMonth == f.FeeMonth {
 
-		totalFee := lastDue
-		calculatedDue := totalFee - f.Amtpaid
+		calculatedDue := lastDue - f.Amtpaid
 
 		if calculatedDue < 0 {
 			calculatedDue = 0
@@ -88,14 +87,13 @@ func CreateFee(f Fees) error {
 		return nil
 	}
 
-
+	// ✅ BLOCK NEXT MONTH IF DUE EXISTS
 	if lastDue > 0 {
-		return fmt.Errorf(" clear previous due first: %d", lastDue)
+		return fmt.Errorf("clear previous due first: %d", lastDue)
 	}
 
-
-	totalFee := MonthlyFee               
-	calculatedDue := totalFee - f.Amtpaid 
+	// ✅ NEW MONTH ENTRY
+	calculatedDue := MonthlyFee - f.Amtpaid
 
 	if calculatedDue < 0 {
 		calculatedDue = 0
@@ -119,6 +117,7 @@ func CreateFee(f Fees) error {
 	return nil
 }
 
+// GET LATEST
 func GetLatestFees() ([]Fees, error) {
 
 	rows, err := database.DB.Query(`
@@ -140,7 +139,7 @@ func GetLatestFees() ([]Fees, error) {
 	}
 	defer rows.Close()
 
-	var fees []Fees
+	var feesList []Fees
 
 	for rows.Next() {
 		var f Fees
@@ -151,13 +150,13 @@ func GetLatestFees() ([]Fees, error) {
 		if err != nil {
 			return nil, err
 		}
-		fees = append(fees, f)
+		feesList = append(feesList, f)
 	}
 
-	return fees, nil
+	return feesList, nil
 }
 
-
+// GET BY STUDENT
 func GetFeesByStudentID(sid int64) ([]Fees, error) {
 
 	rows, err := database.DB.Query(`
@@ -181,7 +180,7 @@ func GetFeesByStudentID(sid int64) ([]Fees, error) {
 	}
 	defer rows.Close()
 
-	var fees []Fees
+	var feesList []Fees
 
 	for rows.Next() {
 		var f Fees
@@ -192,8 +191,8 @@ func GetFeesByStudentID(sid int64) ([]Fees, error) {
 		if err != nil {
 			return nil, err
 		}
-		fees = append(fees, f)
+		feesList = append(feesList, f)
 	}
 
-	return fees, nil
+	return feesList, nil
 }

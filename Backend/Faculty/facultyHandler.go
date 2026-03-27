@@ -1,19 +1,21 @@
-package handlers
+package faculty
 
 import (
 	"net/http"
 	"strconv"
 
-	"github.com/Anuj700077/Dummy-project/models"
 	"github.com/gin-gonic/gin"
 )
 
+// CREATE
 func CreateFaculty(c *gin.Context) {
-	var faculty models.Faculty
+	var faculty Faculty
+
 	if err := c.BindJSON(&faculty); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	err := faculty.CreateFaculty()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert"})
@@ -23,17 +25,18 @@ func CreateFaculty(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Faculty added successfully"})
 }
 
+// GET ALL
 func GetFaculty(c *gin.Context) {
-	faculty, err := models.GetAllFaculty()
+	facultyList, err := GetAllFaculty()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch"})
 		return
 	}
 
-	c.JSON(http.StatusOK, faculty)
+	c.JSON(http.StatusOK, facultyList)
 }
 
-
+// UPDATE
 func UpdateFaculty(c *gin.Context) {
 	idParam := c.Param("id")
 
@@ -43,7 +46,7 @@ func UpdateFaculty(c *gin.Context) {
 		return
 	}
 
-	var faculty models.Faculty
+	var faculty Faculty
 	if err := c.BindJSON(&faculty); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -58,22 +61,21 @@ func UpdateFaculty(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Faculty updated successfully"})
 }
 
-
-
-func DeleteFaculty(c *gin.Context) {
+// DELETE
+func DeleteFacultyHandler(c *gin.Context) {
 	idParam := c.Param("id")
 
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
 
-	err = models.DeleteFaculty(id)
+	err = DeleteFaculty(id)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "Faculty deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Faculty deleted successfully"})
 }
