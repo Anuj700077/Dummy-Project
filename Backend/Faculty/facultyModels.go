@@ -14,7 +14,6 @@ type Faculty struct {
 	DOA        string `json:"doa"`
 }
 
-// CREATE
 func (f *Faculty) CreateFaculty() error {
 	_, err := database.DB.Exec(
 		"INSERT INTO faculty (tname, subject, department, doa) VALUES($1, $2, $3, $4)",
@@ -23,7 +22,6 @@ func (f *Faculty) CreateFaculty() error {
 	return err
 }
 
-// GET ALL
 func GetAllFaculty() ([]Faculty, error) {
 	rows, err := database.DB.Query("SELECT id, tname, subject, department, doa FROM faculty")
 	if err != nil {
@@ -49,7 +47,6 @@ func GetAllFaculty() ([]Faculty, error) {
 	return facultyList, nil
 }
 
-// UPDATE
 func (f *Faculty) UpdateFaculty(id int64) error {
 	_, err := database.DB.Exec(
 		"UPDATE faculty SET tname=$1, subject=$2, department=$3, doa=$4 WHERE id=$5",
@@ -58,7 +55,6 @@ func (f *Faculty) UpdateFaculty(id int64) error {
 	return err
 }
 
-// DELETE
 func DeleteFaculty(id int64) error {
 	_, err := database.DB.Exec("DELETE FROM faculty WHERE id=$1", id)
 	return err

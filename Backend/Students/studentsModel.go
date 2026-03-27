@@ -14,7 +14,6 @@ type Student struct {
 	Dob     string `json:"dob"`
 }
 
-// CREATE
 func (s *Student) Create() error {
 	_, err := database.DB.Exec(
 		"INSERT INTO students(sname, fname, address, dob) VALUES($1,$2,$3,$4)",
@@ -26,7 +25,6 @@ func (s *Student) Create() error {
 	return err
 }
 
-// GET ALL
 func GetAllStudents() ([]Student, error) {
 	rows, err := database.DB.Query("SELECT id, sname, fname, address, dob FROM students")
 	if err != nil {
@@ -52,7 +50,6 @@ func GetAllStudents() ([]Student, error) {
 	return students, nil
 }
 
-// UPDATE
 func (s *Student) Update(id string) error {
 	_, err := database.DB.Exec(
 		`UPDATE students SET sname=$1, fname=$2, address=$3, dob=$4 WHERE id=$5`,
@@ -61,7 +58,6 @@ func (s *Student) Update(id string) error {
 	return err
 }
 
-// DELETE
 func DeleteStudentByID(id string) error {
 	_, err := database.DB.Exec("DELETE FROM students WHERE id=$1", id)
 	return err

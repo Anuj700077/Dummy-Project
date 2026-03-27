@@ -20,7 +20,6 @@ type Marks struct {
 	Percentage float64 `json:"percentage"`
 }
 
-// CREATE OR UPSERT
 func (m *Marks) CreateMark() error {
 
 	if m.Sid == 0 {
@@ -48,7 +47,6 @@ func (m *Marks) CreateMark() error {
 	return nil
 }
 
-// GET ALL
 func GetAllMarks() ([]Marks, error) {
 
 	query := `
@@ -86,7 +84,6 @@ func GetAllMarks() ([]Marks, error) {
 	return marksList, nil
 }
 
-// UPDATE
 func (m *Marks) UpdateMark() error {
 
 	if m.Sid == 0 {
@@ -120,7 +117,6 @@ func (m *Marks) UpdateMark() error {
 	return nil
 }
 
-// DELETE
 func DeleteMark(sid int64) error {
 
 	result, err := database.DB.Exec(

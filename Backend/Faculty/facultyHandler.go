@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CREATE
 func CreateFaculty(c *gin.Context) {
 	var faculty Faculty
 
@@ -25,7 +24,6 @@ func CreateFaculty(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Faculty added successfully"})
 }
 
-// GET ALL
 func GetFaculty(c *gin.Context) {
 	facultyList, err := GetAllFaculty()
 	if err != nil {
@@ -36,7 +34,6 @@ func GetFaculty(c *gin.Context) {
 	c.JSON(http.StatusOK, facultyList)
 }
 
-// UPDATE
 func UpdateFaculty(c *gin.Context) {
 	idParam := c.Param("id")
 
@@ -61,7 +58,6 @@ func UpdateFaculty(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Faculty updated successfully"})
 }
 
-// DELETE
 func DeleteFacultyHandler(c *gin.Context) {
 	idParam := c.Param("id")
 

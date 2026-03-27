@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CREATE
 func CreateFees(c *gin.Context) {
 
 	var fee Fees
@@ -26,7 +25,6 @@ func CreateFees(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "fee added successfully"})
 }
 
-// GET LATEST
 func GetLatestFeesHandler(c *gin.Context) {
 
 	feesList, err := GetLatestFees()
@@ -40,7 +38,6 @@ func GetLatestFeesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, feesList)
 }
 
-// GET BY STUDENT
 func GetFeesByStudent(c *gin.Context) {
 
 	sidParam := c.Param("sid")

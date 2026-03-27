@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CREATE
 func CreateMarks(c *gin.Context) {
 	var m Marks
 
@@ -25,7 +24,6 @@ func CreateMarks(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Marks saved successfully"})
 }
 
-// GET ALL
 func GetMarks(c *gin.Context) {
 
 	marksList, err := GetAllMarks()
@@ -37,7 +35,6 @@ func GetMarks(c *gin.Context) {
 	c.JSON(http.StatusOK, marksList)
 }
 
-// UPDATE
 func UpdateMarks(c *gin.Context) {
 	var m Marks
 
@@ -55,7 +52,6 @@ func UpdateMarks(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "marks updated successfully"})
 }
 
-// DELETE
 func DeleteMarksHandler(c *gin.Context) {
 
 	idParam := c.Param("id")
